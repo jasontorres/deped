@@ -730,3 +730,317 @@ table.editorial tr.clickable { cursor: pointer; }
   font-size: 12px;
   white-space: nowrap;
 }
+
+/* ---------- Mobile navigation ---------- */
+.mobile-menu-toggle {
+  display: none;
+  width: 38px;
+  height: 34px;
+  margin-left: auto;
+  padding: 8px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.mobile-menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.mobile-menu-toggle.open {
+  background: var(--ink);
+  color: var(--paper);
+}
+.mobile-menu-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.mobile-menu-toggle.open span:nth-child(2) { opacity: 0; }
+.mobile-menu-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-nav-panel {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .masthead-inner {
+    padding: 16px;
+    gap: 12px;
+  }
+  .masthead-row {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 12px;
+  }
+  .masthead-date,
+  .masthead-nav {
+    display: none;
+  }
+  .masthead-title {
+    flex: 1;
+    min-width: 0;
+    font-size: 22px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .masthead-title .kicker {
+    font-size: 9px;
+    line-height: 1.35;
+    letter-spacing: 0.14em;
+    margin-bottom: 6px;
+  }
+  .mobile-menu-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+  .mobile-nav-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    border-top: 1px solid transparent;
+    transition: max-height .2s ease, border-color .2s ease, padding .2s ease;
+  }
+  .mobile-nav-panel.open {
+    max-height: 520px;
+    border-top-color: var(--rule-soft);
+    padding-top: 8px;
+  }
+  .mobile-nav-panel button,
+  .mobile-nav-panel a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 11px 0;
+    border: none;
+    border-bottom: 1px solid var(--rule-soft);
+    background: transparent;
+    color: var(--ink-3);
+    font-family: var(--font-hero);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color .2s ease, padding-left .2s ease;
+  }
+  .mobile-nav-panel button.active {
+    color: var(--ink);
+    padding-left: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .mobile-nav-panel a {
+    color: var(--accent);
+  }
+
+  .shell {
+    padding: 20px 16px 64px;
+  }
+  .section-rule {
+    margin: 28px 0 16px;
+  }
+  .section-rule.thin {
+    margin: 22px 0 14px;
+  }
+  .headline {
+    font-size: 25px;
+  }
+  .headline.xl {
+    font-size: 32px;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+  .dek {
+    font-size: 14px;
+  }
+  .card {
+    padding: 14px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .card-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .card-title {
+    font-size: 15px;
+  }
+  .big-num {
+    font-size: 24px;
+  }
+  .big-num .unit {
+    font-size: 10px;
+    vertical-align: 6px;
+  }
+
+  .shell .year-strip {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .shell .year-cell {
+    flex: 0 0 auto;
+    min-width: 120px;
+    padding: 14px 12px 12px;
+  }
+  .shell .year-cell-num {
+    font-size: 22px;
+  }
+  .shell .year-cell-meta {
+    font-size: 10px;
+  }
+
+  .shell .funnel {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .shell .funnel-col {
+    flex: 0 0 110px;
+    min-width: 110px;
+    padding: 12px 10px 14px;
+  }
+  .shell .funnel-col:last-child {
+    border-right: 1px solid var(--rule);
+  }
+  .shell .funnel-amt {
+    font-size: 15px;
+  }
+  .shell .funnel-bar-wrap {
+    height: 76px;
+  }
+
+  .shell .grid,
+  .shell .grid-2,
+  .shell .grid-3,
+  .shell .grid-4,
+  .shell .grid-5 {
+    grid-template-columns: 1fr;
+  }
+  .shell .col-span-2,
+  .shell .col-span-3 {
+    grid-column: auto;
+  }
+
+  .shell table.editorial {
+    min-width: 680px;
+    font-size: 12px;
+  }
+  .shell table.editorial th,
+  .shell table.editorial td {
+    padding: 8px 10px 8px 0;
+  }
+
+  .shell .sankey-wrap {
+    padding: 14px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .shell .sankey-svg {
+    min-width: 720px;
+  }
+  .shell .stage-legend {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+  .shell .list-item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .shell .list-item-amt {
+    white-space: normal;
+  }
+  .shell .scroll-list {
+    max-height: 300px;
+  }
+  .select-input,
+  .text-input {
+    min-height: 38px;
+  }
+  .tt {
+    max-width: calc(100vw - 32px);
+  }
+  .twk-panel {
+    right: 8px !important;
+    bottom: 8px !important;
+    width: min(280px, calc(100vw - 16px)) !important;
+    max-height: min(70vh, 520px) !important;
+  }
+  .twk-fab {
+    right: 12px !important;
+    bottom: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .masthead-inner {
+    padding: 14px 12px;
+  }
+  .masthead-title {
+    font-size: 20px;
+  }
+  .masthead-title .kicker {
+    font-size: 8.5px;
+    letter-spacing: 0.12em;
+  }
+  .mobile-menu-toggle {
+    width: 36px;
+    height: 32px;
+  }
+  .shell {
+    padding: 18px 12px 56px;
+  }
+  .headline {
+    font-size: 23px;
+  }
+  .headline.xl {
+    font-size: 28px;
+  }
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+  .dek {
+    font-size: 13px;
+  }
+  .card {
+    padding: 12px;
+  }
+  .big-num {
+    font-size: 22px;
+  }
+  .shell .year-cell {
+    min-width: 112px;
+    padding: 12px 10px;
+  }
+  .shell .year-cell-num {
+    font-size: 20px;
+  }
+  .shell .funnel-col {
+    flex-basis: 104px;
+    min-width: 104px;
+  }
+  .shell .funnel-stage {
+    font-size: 10px;
+  }
+  .shell table.editorial {
+    min-width: 620px;
+  }
+  .loading-screen {
+    padding: 24px;
+    text-align: center;
+  }
+  .loading-bar {
+    width: min(240px, 70vw);
+  }
+}

@@ -30,6 +30,7 @@ export function PortalPage() {
   const [view, setView] = useState<ViewId>('overview');
   const [year, setYear] = useState(2024);
   const [activePap, setActivePap] = useState<(PapMeta & Record<string, unknown>) | null>(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
@@ -78,6 +79,12 @@ export function PortalPage() {
     setView('overview');
   };
 
+  const selectView = (id: ViewId) => {
+    setActivePap(null);
+    setView(id);
+    setMobileNavOpen(false);
+  };
+
   const navItems: { id: ViewId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'agency', label: 'By agency' },
@@ -97,12 +104,24 @@ export function PortalPage() {
               The <span className="deped-mark">DepEd</span> Budget Portal
             </h1>
             <div className="masthead-date">Compiled · DBM PBC · {budget.data.length.toLocaleString('en-US')} rows</div>
+            <button
+              type="button"
+              className={`mobile-menu-toggle ${mobileNavOpen ? 'open' : ''}`}
+              aria-label={mobileNavOpen ? 'Close navigation' : 'Open navigation'}
+              aria-expanded={mobileNavOpen}
+              aria-controls="mobile-nav"
+              onClick={() => setMobileNavOpen(open => !open)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
           </div>
           <nav className="masthead-nav">
             {navItems.map(n => (
               <button key={n.id}
                       className={view === n.id ? 'active' : ''}
-                      onClick={() => { setActivePap(null); setView(n.id); }}>
+                      onClick={() => selectView(n.id)}>
                 {n.label}
               </button>
             ))}
@@ -110,6 +129,21 @@ export function PortalPage() {
               The Story →
             </Link>
             <Link to="/investigation" className="masthead-nav-link" style={{ marginLeft: 0, color: 'var(--ink-3)' }}>
+              Investigation →
+            </Link>
+          </nav>
+          <nav id="mobile-nav" className={`mobile-nav-panel ${mobileNavOpen ? 'open' : ''}`} aria-hidden={!mobileNavOpen}>
+            {navItems.map(n => (
+              <button key={n.id}
+                      className={view === n.id ? 'active' : ''}
+                      onClick={() => selectView(n.id)}>
+                {n.label}
+              </button>
+            ))}
+            <Link to="/story" onClick={() => setMobileNavOpen(false)}>
+              The Story →
+            </Link>
+            <Link to="/investigation" onClick={() => setMobileNavOpen(false)}>
               Investigation →
             </Link>
           </nav>

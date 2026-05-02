@@ -511,3 +511,98 @@ body {
 /* Chrome adjustment for editorial feel */
 .chrome { font-family: var(--font-ui); }
 .chrome-mark b { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em; }
+
+@media (max-width: 768px) {
+  .h-display { font-size: clamp(48px, 17vw, 86px) !important; }
+  .h-1 { font-size: clamp(40px, 14vw, 68px) !important; }
+  .h-2 { font-size: clamp(30px, 11vw, 48px) !important; }
+  .h-sans-huge { font-size: clamp(64px, 20vw, 118px) !important; }
+  .giant-num { font-size: clamp(72px, 22vw, 128px) !important; }
+  .body {
+    font-size: 17px !important;
+  }
+  .year-banner {
+    gap: 12px;
+    margin: 36px 0;
+  }
+  .year-banner .year,
+  .year-banner .arrow {
+    font-size: clamp(46px, 18vw, 88px);
+  }
+  .year-strip {
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .year-strip .y {
+    flex: 0 0 86px;
+    font-size: 19px;
+  }
+  .year-strip-spaced {
+    gap: 0;
+  }
+  .year-strip-spaced .y {
+    padding: 0 14px;
+  }
+  .flow-row {
+    grid-template-columns: 44px 1fr;
+    gap: 12px 16px;
+  }
+  .flow-row .bar {
+    grid-column: 2;
+  }
+  .flow-row .amt {
+    grid-column: 2;
+    text-align: left;
+    font-size: 21px;
+  }
+  .flow-row .name {
+    font-size: 24px;
+  }
+  .unlock-card {
+    padding: 28px 20px;
+  }
+  .arrow-forward {
+    font-size: clamp(96px, 30vw, 180px);
+  }
+}
+
+@media (max-width: 480px) {
+  .h-display { font-size: clamp(42px, 18vw, 72px) !important; }
+  .h-1 { font-size: clamp(36px, 15vw, 58px) !important; }
+  .h-sans-huge { font-size: clamp(56px, 21vw, 94px) !important; }
+  .giant-num { font-size: clamp(64px, 24vw, 104px) !important; }
+  .pull {
+    font-size: clamp(27px, 11vw, 44px) !important;
+  }
+  .body {
+    font-size: 16px !important;
+  }
+  .year-banner {
+    margin: 28px 0;
+  }
+  .year-banner .span-label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+  .year-strip .y {
+    flex-basis: 74px;
+    font-size: 17px;
+  }
+  .flow-row {
+    grid-template-columns: 1fr;
+  }
+  .flow-row .bar,
+  .flow-row .amt {
+    grid-column: auto;
+  }
+  .flow-row .rank {
+    font-size: 18px;
+  }
+  .flow-row .name {
+    font-size: 22px;
+  }
+  .unlock-card {
+    padding: 24px 16px;
+  }
+}
