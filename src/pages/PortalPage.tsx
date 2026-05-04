@@ -183,10 +183,10 @@ export function PortalPage() {
           />
         )}
         {view === 'leaderboard' && (
-          <Leaderboard paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear} onPapClick={onPapClick} />
+          <Leaderboard paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear} allYears={years} yearStage={yearStage} onPapClick={onPapClick} />
         )}
         {view === 'augmentation' && (
-          <AugmentationTracker paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear} onPapClick={onPapClick} />
+          <AugmentationTracker paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear} allYears={years} yearStage={yearStage} onPapClick={onPapClick} />
         )}
         {view === 'comparison' && (
           <YearComparison STAGES={STAGES} yearStage={yearStage}
@@ -309,13 +309,13 @@ function OverviewView({ STAGES, years, year, setYear, yearStage, agencyYearStage
       <Eyebrow>Pick a fiscal year</Eyebrow>
       <div className="year-strip" style={{ marginTop: 8 }}>
         {years.map(y => {
-          const t = yearStage[y]?.NEP?.total;
-          const max = Math.max(...years.map(yy => yearStage[yy]?.NEP?.total || 0));
+          const t = yearStage[y]?.GAA?.total;
+          const max = Math.max(...years.map(yy => yearStage[yy]?.GAA?.total || 0));
           const pctVal = max ? ((t || 0) / max) * 100 : 0;
           return (
             <Link key={y} to={`/year/${y}`} className={`year-cell ${year === y ? 'active' : ''}`} onClick={() => setYear(y)}>
               <div className="year-cell-num">FY {y}</div>
-              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} NEP</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} GAA</div>
               <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
             </Link>
           );

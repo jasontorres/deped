@@ -26,8 +26,8 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
   }, [year]);
 
   const agencies = Object.keys(agencyYearStage).sort((a, b) => {
-    const ta = agencyYearStage[a][selectedYear]?.NEP?.total || 0;
-    const tb = agencyYearStage[b][selectedYear]?.NEP?.total || 0;
+    const ta = agencyYearStage[a][selectedYear]?.GAA?.total || 0;
+    const tb = agencyYearStage[b][selectedYear]?.GAA?.total || 0;
     return tb - ta;
   });
   const agencyCodeByName = new Map(paps.map(p => [p.agencyName, p.agency]));
@@ -41,18 +41,18 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
 
   const sortedPaps = agencyPaps.map(p => {
     const yd = pivot[p.papKey]?.[selectedYear] || {};
-    const nepTotal = yd.NEP?.total || 0;
+    const gaaTotal = yd.GAA?.total || 0;
     const disbursed = yd.Disbursements?.total;
     const allotted = yd.Allotted?.total;
     return {
       ...p,
       stageTotals: yd,
-      nepTotal,
+      gaaTotal,
       dr: (allotted && disbursed) ? disbursed / allotted : null,
     };
-  }).sort((a, b) => b.nepTotal - a.nepTotal);
+  }).sort((a, b) => b.gaaTotal - a.gaaTotal);
 
-  const total = ay.NEP?.total || 0;
+  const total = ay.GAA?.total || 0;
 
   return (
     <div className="view">
@@ -65,13 +65,13 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
       <Eyebrow>Pick a fiscal year</Eyebrow>
       <div className="year-strip agency-year-strip" style={{ marginTop: 8, marginBottom: 18 }}>
         {allYears.map(y => {
-          const t = agencyYearStage[agency]?.[y]?.NEP?.total;
-          const maxYear = Math.max(...allYears.map(yy => agencyYearStage[agency]?.[yy]?.NEP?.total || 0));
+          const t = agencyYearStage[agency]?.[y]?.GAA?.total;
+          const maxYear = Math.max(...allYears.map(yy => agencyYearStage[agency]?.[yy]?.GAA?.total || 0));
           const pctVal = maxYear ? ((t || 0) / maxYear) * 100 : 0;
           return (
             <button key={y} type="button" className={`year-cell ${selectedYear === y ? 'active' : ''}`} onClick={() => setSelectedYear(y)}>
               <div className="year-cell-num">FY {y}</div>
-              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} NEP</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} GAA</div>
               <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
             </button>
           );
@@ -128,7 +128,7 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
                 <th>Program / Activity / Project</th>
                 <th>Function</th>
                 {STAGES.map(s => <th key={s.key} className="right">{s.label}</th>)}
-                <th className="right">% of agency</th>
+                <th className="right">% of agency GAA</th>
                 <th className="right">Disb. rate</th>
                 <th></th>
               </tr>
@@ -146,7 +146,7 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
                       </td>
                     );
                   })}
-                  <td className="right">{p.nepTotal && total ? fmt.pct(p.nepTotal / total, 1) : "—"}</td>
+                  <td className="right">{p.gaaTotal && total ? fmt.pct(p.gaaTotal / total, 1) : "—"}</td>
                   <td className="right">
                     {p.dr != null ? <span className={p.dr >= 0.9 ? "delta-pos" : p.dr < 0.6 ? "delta-neg" : ""}>{fmt.pct(p.dr, 0)}</span> : <span className="muted">—</span>}
                   </td>
@@ -168,6 +168,8 @@ interface LeaderboardProps {
   pivot: Record<string, Record<number, Record<string, StageTotals>>>;
   currency: string;
   year: number;
+  allYears: number[];
+  yearStage: Record<number, Record<string, StageTotals>>;
   onPapClick: (pap: PapMeta & Record<string, unknown>) => void;
 }
 
@@ -175,21 +177,25 @@ interface RankedPap extends PapMeta {
   [key: string]: unknown;
   allotted: number;
   disbursed: number;
-  nep: number;
   rate: number;
 }
 
-export const Leaderboard = ({ paps, pivot, currency, year, onPapClick }: LeaderboardProps) => {
+export const Leaderboard = ({ paps, pivot, currency, year, allYears, yearStage, onPapClick }: LeaderboardProps) => {
+  const [selectedYear, setSelectedYear] = useState(year);
+
+  useEffect(() => {
+    setSelectedYear(year);
+  }, [year]);
+
   const ranked = paps.map(p => {
-    const yd = pivot[p.papKey]?.[year];
+    const yd = pivot[p.papKey]?.[selectedYear];
     if (!yd) return null;
     const allotted = yd.Allotted?.total;
     const disbursed = yd.Disbursements?.total;
-    const nep = yd.NEP?.total;
     if (!allotted || !disbursed || allotted < 1e6) return null;
     return {
       ...p,
-      allotted, disbursed, nep: nep || 0,
+      allotted, disbursed,
       rate: disbursed / allotted,
     };
   }).filter((x): x is RankedPap => x != null);
@@ -222,15 +228,30 @@ export const Leaderboard = ({ paps, pivot, currency, year, onPapClick }: Leaderb
   return (
     <div className="view">
       <SectionHead
-        eyebrow={`Absorption · FY ${year}`}
+        eyebrow={`Absorption · FY ${selectedYear}`}
         headline="Where the money actually went"
         dek="Disbursement rate = cash actually paid ÷ amount released. Programs at the bottom either struggled to spend or were stalled."
       />
+      <Eyebrow>Pick a fiscal year</Eyebrow>
+      <div className="year-strip" style={{ marginTop: 8, marginBottom: 18 }}>
+        {allYears.map(y => {
+          const t = yearStage[y]?.GAA?.total;
+          const maxYear = Math.max(...allYears.map(yy => yearStage[yy]?.GAA?.total || 0));
+          const pctVal = maxYear ? ((t || 0) / maxYear) * 100 : 0;
+          return (
+            <button key={y} type="button" className={`year-cell ${selectedYear === y ? 'active' : ''}`} onClick={() => setSelectedYear(y)}>
+              <div className="year-cell-num">FY {y}</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} GAA</div>
+              <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
+            </button>
+          );
+        })}
+      </div>
       <div className="grid grid-2 gap-6">
         <div className="card">
           <div className="card-head">
             <h3 className="card-title">Top absorbers</h3>
-            <span className="card-meta">FY {year}</span>
+            <span className="card-meta">FY {selectedYear}</span>
           </div>
           <table className="editorial">
             <thead><tr>
@@ -242,7 +263,7 @@ export const Leaderboard = ({ paps, pivot, currency, year, onPapClick }: Leaderb
         <div className="card">
           <div className="card-head">
             <h3 className="card-title">Bottom absorbers</h3>
-            <span className="card-meta">FY {year}</span>
+            <span className="card-meta">FY {selectedYear}</span>
           </div>
           <table className="editorial">
             <thead><tr>
@@ -263,6 +284,8 @@ interface AugmentationTrackerProps {
   pivot: Record<string, Record<number, Record<string, StageTotals>>>;
   currency: string;
   year: number;
+  allYears: number[];
+  yearStage: Record<number, Record<string, StageTotals>>;
   onPapClick: (pap: PapMeta & Record<string, unknown>) => void;
 }
 
@@ -274,9 +297,15 @@ interface AugItem extends PapMeta {
   pct: number;
 }
 
-export const AugmentationTracker = ({ paps, pivot, currency, year, onPapClick }: AugmentationTrackerProps) => {
+export const AugmentationTracker = ({ paps, pivot, currency, year, allYears, yearStage, onPapClick }: AugmentationTrackerProps) => {
+  const [selectedYear, setSelectedYear] = useState(year);
+
+  useEffect(() => {
+    setSelectedYear(year);
+  }, [year]);
+
   const items = paps.map(p => {
-    const yd = pivot[p.papKey]?.[year];
+    const yd = pivot[p.papKey]?.[selectedYear];
     if (!yd) return null;
     const auth = yd.Authorized?.total;
     const adj = yd.Adjusted?.total;
@@ -306,10 +335,25 @@ export const AugmentationTracker = ({ paps, pivot, currency, year, onPapClick }:
   return (
     <div className="view">
       <SectionHead
-        eyebrow={`Adjustments · FY ${year}`}
+        eyebrow={`Adjustments · FY ${selectedYear}`}
         headline="Augmentations and cuts mid-year"
         dek="The space between the authorized and adjusted budget shows where money was added (augmented) or pulled back (cut) after Congress acted."
       />
+      <Eyebrow>Pick a fiscal year</Eyebrow>
+      <div className="year-strip" style={{ marginTop: 8, marginBottom: 18 }}>
+        {allYears.map(y => {
+          const t = yearStage[y]?.GAA?.total;
+          const maxYear = Math.max(...allYears.map(yy => yearStage[yy]?.GAA?.total || 0));
+          const pctVal = maxYear ? ((t || 0) / maxYear) * 100 : 0;
+          return (
+            <button key={y} type="button" className={`year-cell ${selectedYear === y ? 'active' : ''}`} onClick={() => setSelectedYear(y)}>
+              <div className="year-cell-num">FY {y}</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} GAA</div>
+              <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
+            </button>
+          );
+        })}
+      </div>
       <div className="grid grid-2 gap-6">
         <div className="card">
           <div className="card-head">
@@ -487,13 +531,13 @@ export const YearComparison = ({ STAGES, yearStage, currency, allYears, year }: 
       <Eyebrow>Pick a fiscal year</Eyebrow>
       <div className="year-strip" style={{ marginTop: 8, marginBottom: 28 }}>
         {allYears.map(y => {
-          const t = yearStage[y]?.NEP?.total;
-          const maxYear = Math.max(...allYears.map(yy => yearStage[yy]?.NEP?.total || 0));
+          const t = yearStage[y]?.GAA?.total;
+          const maxYear = Math.max(...allYears.map(yy => yearStage[yy]?.GAA?.total || 0));
           const pctVal = maxYear ? ((t || 0) / maxYear) * 100 : 0;
           return (
             <Link key={y} to={`/year/${y}`} className={`year-cell ${year === y ? 'active' : ''}`}>
               <div className="year-cell-num">FY {y}</div>
-              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} NEP</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} GAA</div>
               <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
             </Link>
           );
