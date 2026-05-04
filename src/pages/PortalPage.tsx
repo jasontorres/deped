@@ -142,7 +142,7 @@ export function PortalPage() {
               The Story →
             </Link>
             <Link to="/investigation" className="masthead-nav-link" style={{ marginLeft: 0, color: 'var(--ink-3)' }}>
-              Story B →
+              BUDGET PREPARATION →
             </Link>
           </nav>
           <nav id="mobile-nav" className={`mobile-nav-panel ${mobileNavOpen ? 'open' : ''}`} aria-hidden={!mobileNavOpen}>
@@ -158,7 +158,7 @@ export function PortalPage() {
               The Story →
             </Link>
             <Link to="/investigation" onClick={() => setMobileNavOpen(false)}>
-              Story B →
+              BUDGET PREPARATION →
             </Link>
           </nav>
         </div>
@@ -177,6 +177,7 @@ export function PortalPage() {
           <AgencyOverview
             STAGES={STAGES} agencyYearStage={agencyYearStage}
             paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear}
+            allYears={years}
             selectedAgencyId={agencyId}
             onPapClick={onPapClick}
           />
@@ -202,6 +203,11 @@ export function PortalPage() {
           />
         )}
       </main>
+
+      <footer className="portal-footer">
+        <p>Data sources from DBM and DepEd. Data prepared by People's Budget Coalition. Portal by BetterGov.ph.</p>
+        <p>All data are under Public Domain / CC 4.0.</p>
+      </footer>
 
       <TweaksPanel title="Tweaks">
         <TweakSection label="Typography">

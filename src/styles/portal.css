@@ -184,6 +184,23 @@ button {
   padding: 28px 32px 80px;
 }
 
+.portal-footer {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px 40px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.portal-footer p {
+  margin: 0;
+}
+.portal-footer p + p {
+  margin-top: 6px;
+}
+
 .section-rule {
   border: none;
   border-top: 1px solid var(--ink);
@@ -314,8 +331,12 @@ button {
   flex: 1;
   padding: 18px 16px 16px;
   border-right: 1px solid var(--rule);
+  border-top: 0;
+  border-bottom: 0;
+  border-left: 0;
   background: transparent;
   color: inherit;
+  font: inherit;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
@@ -359,6 +380,14 @@ button {
 }
 .year-cell.active .year-cell-bar { background: rgba(255,255,255,0.2); }
 .year-cell.active .year-cell-bar > span { background: var(--paper); }
+
+.agency-program-table {
+  min-width: 1180px;
+}
+.agency-program-table th:first-child,
+.agency-program-table td:first-child {
+  min-width: 280px;
+}
 
 /* ---------- Funnel (stage-by-stage) ---------- */
 .funnel {

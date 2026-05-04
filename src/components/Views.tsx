@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Stage, StageTotals, PapMeta } from '../lib/data-loader';
 import fmt from '../lib/format';
@@ -13,14 +13,21 @@ interface AgencyOverviewProps {
   pivot: Record<string, Record<number, Record<string, StageTotals>>>;
   currency: string;
   year: number;
+  allYears: number[];
   selectedAgencyId?: string;
   onPapClick: (pap: PapMeta & Record<string, unknown>) => void;
 }
 
-export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency, year, selectedAgencyId, onPapClick }: AgencyOverviewProps) => {
+export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency, year, allYears, selectedAgencyId, onPapClick }: AgencyOverviewProps) => {
+  const [selectedYear, setSelectedYear] = useState(year);
+
+  useEffect(() => {
+    setSelectedYear(year);
+  }, [year]);
+
   const agencies = Object.keys(agencyYearStage).sort((a, b) => {
-    const ta = agencyYearStage[a][year]?.NEP?.total || 0;
-    const tb = agencyYearStage[b][year]?.NEP?.total || 0;
+    const ta = agencyYearStage[a][selectedYear]?.NEP?.total || 0;
+    const tb = agencyYearStage[b][selectedYear]?.NEP?.total || 0;
     return tb - ta;
   });
   const agencyCodeByName = new Map(paps.map(p => [p.agencyName, p.agency]));
@@ -29,14 +36,20 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
     : null;
   const agency = selectedAgencyName || agencies[0] || "Office of the Secretary";
 
-  const ay = agencyYearStage[agency]?.[year] || {};
+  const ay = agencyYearStage[agency]?.[selectedYear] || {};
   const agencyPaps = paps.filter(p => p.agencyName === agency);
 
   const sortedPaps = agencyPaps.map(p => {
-    const t = pivot[p.papKey]?.[year]?.NEP?.total || 0;
-    const disbursed = pivot[p.papKey]?.[year]?.Disbursements?.total;
-    const allotted = pivot[p.papKey]?.[year]?.Allotted?.total;
-    return { ...p, nepTotal: t, dr: (allotted && disbursed) ? disbursed / allotted : null };
+    const yd = pivot[p.papKey]?.[selectedYear] || {};
+    const nepTotal = yd.NEP?.total || 0;
+    const disbursed = yd.Disbursements?.total;
+    const allotted = yd.Allotted?.total;
+    return {
+      ...p,
+      stageTotals: yd,
+      nepTotal,
+      dr: (allotted && disbursed) ? disbursed / allotted : null,
+    };
   }).sort((a, b) => b.nepTotal - a.nepTotal);
 
   const total = ay.NEP?.total || 0;
@@ -48,6 +61,22 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
         headline="Programs by agency"
         dek="Drill into a single agency to see every program/activity it runs and how each one performed."
       />
+
+      <Eyebrow>Pick a fiscal year</Eyebrow>
+      <div className="year-strip agency-year-strip" style={{ marginTop: 8, marginBottom: 18 }}>
+        {allYears.map(y => {
+          const t = agencyYearStage[agency]?.[y]?.NEP?.total;
+          const maxYear = Math.max(...allYears.map(yy => agencyYearStage[agency]?.[yy]?.NEP?.total || 0));
+          const pctVal = maxYear ? ((t || 0) / maxYear) * 100 : 0;
+          return (
+            <button key={y} type="button" className={`year-cell ${selectedYear === y ? 'active' : ''}`} onClick={() => setSelectedYear(y)}>
+              <div className="year-cell-num">FY {y}</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} NEP</div>
+              <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
+            </button>
+          );
+        })}
+      </div>
 
       <div className="flex gap-2" style={{ marginBottom: 16, flexWrap: "wrap" }}>
         {agencies.map(a => (
@@ -70,7 +99,7 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
 
       <div className="grid grid-4" style={{ marginBottom: 18 }}>
         <div className="card subtle">
-          <div className="card-meta">FY {year} NEP</div>
+          <div className="card-meta">FY {selectedYear} NEP</div>
           <div className="big-num">{fmt.php(ay.NEP?.total, { unit: currency as "auto" | "B" | "M" })}</div>
         </div>
         <div className="card subtle">
@@ -90,34 +119,43 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
       <div className="card">
         <div className="card-head">
           <h3 className="card-title">{agency} · {agencyPaps.length} programs</h3>
-          <span className="card-meta">Click a row to open journey</span>
+          <span className="card-meta">FY {selectedYear} · click a row to open journey</span>
         </div>
-        <table className="editorial">
-          <thead>
-            <tr>
-              <th>Program / Activity / Project</th>
-              <th>Function</th>
-              <th className="right">NEP {year}</th>
-              <th className="right">% of agency</th>
-              <th className="right">Disb. rate</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedPaps.map(p => (
-              <tr key={p.papKey} className="clickable" onClick={() => onPapClick(p)}>
-                <td>{p.pap}</td>
-                <td className="text-xs muted">{p.progName}</td>
-                <td className="right">{p.nepTotal ? fmt.shortPhp(p.nepTotal, "M") : <span className="muted">—</span>}</td>
-                <td className="right">{p.nepTotal && total ? fmt.pct(p.nepTotal / total, 1) : "—"}</td>
-                <td className="right">
-                  {p.dr != null ? <span className={p.dr >= 0.9 ? "delta-pos" : p.dr < 0.6 ? "delta-neg" : ""}>{fmt.pct(p.dr, 0)}</span> : <span className="muted">—</span>}
-                </td>
-                <td className="muted">→</td>
+        <div style={{ overflowX: "auto" }}>
+          <table className="editorial agency-program-table">
+            <thead>
+              <tr>
+                <th>Program / Activity / Project</th>
+                <th>Function</th>
+                {STAGES.map(s => <th key={s.key} className="right">{s.label}</th>)}
+                <th className="right">% of agency</th>
+                <th className="right">Disb. rate</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedPaps.map(p => (
+                <tr key={p.papKey} className="clickable" onClick={() => onPapClick(p)}>
+                  <td>{p.pap}</td>
+                  <td className="text-xs muted">{p.progName}</td>
+                  {STAGES.map(s => {
+                    const stageTotal = p.stageTotals[s.key]?.total;
+                    return (
+                      <td key={s.key} className="right">
+                        {stageTotal ? fmt.shortPhp(stageTotal, "M") : <span className="muted">—</span>}
+                      </td>
+                    );
+                  })}
+                  <td className="right">{p.nepTotal && total ? fmt.pct(p.nepTotal / total, 1) : "—"}</td>
+                  <td className="right">
+                    {p.dr != null ? <span className={p.dr >= 0.9 ? "delta-pos" : p.dr < 0.6 ? "delta-neg" : ""}>{fmt.pct(p.dr, 0)}</span> : <span className="muted">—</span>}
+                  </td>
+                  <td className="muted">→</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
