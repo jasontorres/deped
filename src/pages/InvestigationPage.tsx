@@ -5,7 +5,7 @@ import '../styles/narrative.css';
 const BODY_HTML = `<!-- Top chrome -->
 <div class="chrome">
   <div class="chrome-mark"><b>Inside</b> the DepEd Budget</div>
-  <a href="/">← Return to portal</a>
+  <a href="/overview">Browse the Transparency Portal</a>
 </div>
 
 <!-- Progress -->
@@ -777,7 +777,7 @@ const BODY_HTML = `<!-- Top chrome -->
     Source: Department of Budget and Management releases (NEP, GAA, BESF, BAR/FAR submissions) compiled into a single dataset of 4,440 program-stage observations spanning fiscal years 2021–2026. Disbursement data unavailable for 2026 as of compilation. Augmentation calculations compare cumulative agency totals at NEP versus enacted GAA. Absorption rates calculated as Disbursements ÷ Adjusted Total Allotments within each fiscal year. Capital Outlay 2026 figure is the GAA-stage total reported by DBM. Stock photography: Unsplash.
   </p>
   <p class="meta">
-    Inside the DepEd Budget · A scrollytelling investigation · <a href="/" style="color:inherit;">Return to portal →</a>
+    Inside the DepEd Budget · A scrollytelling investigation · <a href="/overview" style="color:inherit;">Browse the Transparency Portal →</a>
   </p>
 </footer>
 

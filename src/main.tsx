@@ -10,7 +10,15 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PortalPage />} />
+        <Route path="/" element={<StoryPage />} />
+        <Route path="/overview" element={<PortalPage />} />
+        <Route path="/agencies" element={<PortalPage />} />
+        <Route path="/agency/:agencyId" element={<PortalPage />} />
+        <Route path="/agency/:agencyId/:programId" element={<PortalPage />} />
+        <Route path="/absorption" element={<PortalPage />} />
+        <Route path="/augmentations" element={<PortalPage />} />
+        <Route path="/year/:yearId" element={<PortalPage />} />
+        <Route path="/search" element={<PortalPage />} />
         <Route path="/investigation" element={<InvestigationPage />} />
         <Route path="/story" element={<StoryPage />} />
       </Routes>

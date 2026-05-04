@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { BudgetData, PapMeta, StageTotals } from '../lib/data-loader';
 import { loadBudget } from '../lib/data-loader';
 import fmt from '../lib/format';
@@ -10,6 +10,8 @@ import { PapDetail } from '../components/PapDetail';
 import { useTweaks, TweaksPanel, TweakSection, TweakSelect, TweakSlider, TweakColor, TweakRadio, TweakButton } from '../components/TweaksPanel';
 
 type ViewId = 'overview' | 'agency' | 'leaderboard' | 'augmentation' | 'comparison' | 'search' | 'pap';
+
+const programPath = (pap: PapMeta) => `/agency/${encodeURIComponent(pap.agency)}/${encodeURIComponent(pap.subprog || pap.papKey)}`;
 
 const TWEAK_DEFAULTS = {
   currency: 'auto',
@@ -25,11 +27,12 @@ const TWEAK_DEFAULTS = {
 };
 
 export function PortalPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { agencyId, programId, yearId } = useParams();
   const [budget, setBudget] = useState<BudgetData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<ViewId>('overview');
   const [year, setYear] = useState(2024);
-  const [activePap, setActivePap] = useState<(PapMeta & Record<string, unknown>) | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -49,12 +52,13 @@ export function PortalPage() {
 
   useEffect(() => {
     loadBudget()
-      .then(b => {
-        setBudget(b);
-        setYear(2024);
-      })
+      .then(b => setBudget(b))
       .catch(e => setError(e.message));
   }, []);
+
+  useEffect(() => {
+    if (yearId) setYear(+yearId);
+  }, [yearId]);
 
   if (error) return <div className="loading-screen"><Headline>Couldn't load data</Headline><p className="muted">{error}</p></div>;
   if (!budget) return (
@@ -67,31 +71,39 @@ export function PortalPage() {
   );
 
   const { STAGES, yearStage, agencyYearStage, paps, pivot, years, data } = budget;
+  const routeYear = yearId ? +yearId : null;
+  const currentYear = routeYear && years.includes(routeYear) ? routeYear : year;
+  const activePap = agencyId && programId
+    ? paps.find(p => p.agency === agencyId && (p.subprog === programId || p.papKey === programId)) || null
+    : null;
+  const view: ViewId = activePap ? 'pap'
+    : location.pathname.startsWith('/agency') || location.pathname === '/agencies' ? 'agency'
+    : location.pathname === '/absorption' ? 'leaderboard'
+    : location.pathname === '/augmentations' ? 'augmentation'
+    : location.pathname.startsWith('/year/') ? 'comparison'
+    : location.pathname === '/overview' ? 'overview'
+    : 'search';
 
   const onPapClick = (papMeta: PapMeta & Record<string, unknown>) => {
-    setActivePap(papMeta);
-    setView('pap');
+    navigate(programPath(papMeta));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const closeDetail = () => {
-    setActivePap(null);
-    setView('overview');
+    navigate(agencyId ? `/agency/${encodeURIComponent(agencyId)}` : '/agencies');
   };
 
-  const selectView = (id: ViewId) => {
-    setActivePap(null);
-    setView(id);
+  const selectView = () => {
     setMobileNavOpen(false);
   };
 
-  const navItems: { id: ViewId; label: string }[] = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'agency', label: 'By agency' },
-    { id: 'leaderboard', label: 'Absorption' },
-    { id: 'augmentation', label: 'Augmentations' },
-    { id: 'comparison', label: 'By year' },
-    { id: 'search', label: 'Search' },
+  const navItems: { id: ViewId; label: string; to: string }[] = [
+    { id: 'overview', label: 'Overview', to: '/overview' },
+    { id: 'agency', label: 'By agency', to: '/agencies' },
+    { id: 'leaderboard', label: 'Absorption', to: '/absorption' },
+    { id: 'augmentation', label: 'Augmentations', to: '/augmentations' },
+    { id: 'comparison', label: 'By year', to: `/year/${currentYear}` },
+    { id: 'search', label: 'Search', to: '/search' },
   ];
 
   return (
@@ -119,32 +131,34 @@ export function PortalPage() {
           </div>
           <nav className="masthead-nav">
             {navItems.map(n => (
-              <button key={n.id}
+              <NavLink key={n.id}
+                      to={n.to}
                       className={view === n.id ? 'active' : ''}
-                      onClick={() => selectView(n.id)}>
+                      onClick={selectView}>
                 {n.label}
-              </button>
+              </NavLink>
             ))}
-            <Link to="/story" className="masthead-nav-link">
+            <Link to="/" className="masthead-nav-link">
               The Story →
             </Link>
             <Link to="/investigation" className="masthead-nav-link" style={{ marginLeft: 0, color: 'var(--ink-3)' }}>
-              Investigation →
+              Story B →
             </Link>
           </nav>
           <nav id="mobile-nav" className={`mobile-nav-panel ${mobileNavOpen ? 'open' : ''}`} aria-hidden={!mobileNavOpen}>
             {navItems.map(n => (
-              <button key={n.id}
+              <NavLink key={n.id}
+                      to={n.to}
                       className={view === n.id ? 'active' : ''}
-                      onClick={() => selectView(n.id)}>
+                      onClick={selectView}>
                 {n.label}
-              </button>
+              </NavLink>
             ))}
-            <Link to="/story" onClick={() => setMobileNavOpen(false)}>
+            <Link to="/" onClick={() => setMobileNavOpen(false)}>
               The Story →
             </Link>
             <Link to="/investigation" onClick={() => setMobileNavOpen(false)}>
-              Investigation →
+              Story B →
             </Link>
           </nav>
         </div>
@@ -153,7 +167,7 @@ export function PortalPage() {
       <main className="shell">
         {view === 'overview' && (
           <OverviewView
-            STAGES={STAGES} years={years} year={year} setYear={setYear}
+            STAGES={STAGES} years={years} year={currentYear} setYear={setYear}
             yearStage={yearStage} agencyYearStage={agencyYearStage}
             paps={paps} pivot={pivot} currency={tweaks.currency}
             onPapClick={onPapClick}
@@ -162,19 +176,20 @@ export function PortalPage() {
         {view === 'agency' && (
           <AgencyOverview
             STAGES={STAGES} agencyYearStage={agencyYearStage}
-            paps={paps} pivot={pivot} currency={tweaks.currency} year={year}
+            paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear}
+            selectedAgencyId={agencyId}
             onPapClick={onPapClick}
           />
         )}
         {view === 'leaderboard' && (
-          <Leaderboard paps={paps} pivot={pivot} currency={tweaks.currency} year={year} onPapClick={onPapClick} />
+          <Leaderboard paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear} onPapClick={onPapClick} />
         )}
         {view === 'augmentation' && (
-          <AugmentationTracker paps={paps} pivot={pivot} currency={tweaks.currency} year={year} onPapClick={onPapClick} />
+          <AugmentationTracker paps={paps} pivot={pivot} currency={tweaks.currency} year={currentYear} onPapClick={onPapClick} />
         )}
         {view === 'comparison' && (
-          <YearComparison STAGES={STAGES} yearStage={yearStage} agencyYearStage={agencyYearStage}
-                          currency={tweaks.currency} allYears={years} />
+          <YearComparison STAGES={STAGES} yearStage={yearStage}
+                          currency={tweaks.currency} allYears={years} year={currentYear} />
         )}
         {view === 'search' && (
           <SearchTable data={data} STAGES={STAGES} currency={tweaks.currency}
@@ -292,11 +307,11 @@ function OverviewView({ STAGES, years, year, setYear, yearStage, agencyYearStage
           const max = Math.max(...years.map(yy => yearStage[yy]?.NEP?.total || 0));
           const pctVal = max ? ((t || 0) / max) * 100 : 0;
           return (
-            <button key={y} className={`year-cell ${year === y ? 'active' : ''}`} onClick={() => setYear(y)}>
+            <Link key={y} to={`/year/${y}`} className={`year-cell ${year === y ? 'active' : ''}`} onClick={() => setYear(y)}>
               <div className="year-cell-num">FY {y}</div>
               <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} NEP</div>
               <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
-            </button>
+            </Link>
           );
         })}
       </div>

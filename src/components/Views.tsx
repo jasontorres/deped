@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { Stage, StageTotals, PapMeta } from '../lib/data-loader';
 import fmt from '../lib/format';
 import { SectionHead, Eyebrow } from './Shared';
@@ -12,16 +13,21 @@ interface AgencyOverviewProps {
   pivot: Record<string, Record<number, Record<string, StageTotals>>>;
   currency: string;
   year: number;
+  selectedAgencyId?: string;
   onPapClick: (pap: PapMeta & Record<string, unknown>) => void;
 }
 
-export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency, year, onPapClick }: AgencyOverviewProps) => {
-  const [agency, setAgency] = useState("Office of the Secretary");
+export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency, year, selectedAgencyId, onPapClick }: AgencyOverviewProps) => {
   const agencies = Object.keys(agencyYearStage).sort((a, b) => {
     const ta = agencyYearStage[a][year]?.NEP?.total || 0;
     const tb = agencyYearStage[b][year]?.NEP?.total || 0;
     return tb - ta;
   });
+  const agencyCodeByName = new Map(paps.map(p => [p.agencyName, p.agency]));
+  const selectedAgencyName = selectedAgencyId
+    ? paps.find(p => p.agency === selectedAgencyId)?.agencyName
+    : null;
+  const agency = selectedAgencyName || agencies[0] || "Office of the Secretary";
 
   const ay = agencyYearStage[agency]?.[year] || {};
   const agencyPaps = paps.filter(p => p.agencyName === agency);
@@ -45,9 +51,9 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
 
       <div className="flex gap-2" style={{ marginBottom: 16, flexWrap: "wrap" }}>
         {agencies.map(a => (
-          <button
+          <Link
             key={a}
-            onClick={() => setAgency(a)}
+            to={`/agency/${encodeURIComponent(agencyCodeByName.get(a) || a)}`}
             className="pill"
             style={{
               cursor: "pointer",
@@ -58,7 +64,7 @@ export const AgencyOverview = ({ STAGES, agencyYearStage, paps, pivot, currency,
             }}
           >
             {a}
-          </button>
+          </Link>
         ))}
       </div>
 
@@ -418,67 +424,68 @@ export const SearchTable = ({ data, STAGES, currency, onPapClick, paps, pivot, a
 interface YearComparisonProps {
   STAGES: Stage[];
   yearStage: Record<number, Record<string, StageTotals>>;
-  agencyYearStage: Record<string, Record<number, Record<string, StageTotals>>>;
   currency: string;
   allYears: number[];
-}
-
-interface YearRow {
   year: number;
-  ps: number;
-  mooe: number;
-  co: number;
-  total: number;
-  [key: string]: number;
 }
 
-export const YearComparison = ({ STAGES, yearStage, agencyYearStage, currency, allYears }: YearComparisonProps) => {
-  const [stage, setStage] = useState("GAA");
-  const data: YearRow[] = allYears.map(y => ({
-    year: y,
-    ...(yearStage[y]?.[stage] || { ps: 0, mooe: 0, co: 0, total: 0 }),
+export const YearComparison = ({ STAGES, yearStage, currency, allYears, year }: YearComparisonProps) => {
+  const selectedYearData = yearStage[year] || {};
+  const stageRows = STAGES.map(stage => ({
+    ...stage,
+    ...(selectedYearData[stage.key] || { ps: 0, mooe: 0, co: 0, total: 0 }),
   }));
-  const max = Math.max(...data.map(d => d.total), 1);
-
-  const selectedStage = STAGES.find(s => s.key === stage);
+  const max = Math.max(...stageRows.map(d => d.total), 1);
+  const latestComplete = selectedYearData.GAA || selectedYearData.NEP || { ps: 0, mooe: 0, co: 0, total: 0 };
 
   return (
     <div className="view">
       <SectionHead
-        eyebrow="Year comparison"
-        headline="Personnel · Operations · Capital, year by year"
-        dek="The shape of the budget. Personnel costs (PS) tend to dominate; capital outlay (CO) is the swing variable."
-        right={
-          <select className="select-input" value={stage} onChange={e => setStage(e.target.value)}>
-            {STAGES.map(s => <option key={s.key} value={s.key}>{s.full}</option>)}
-          </select>
-        }
+        eyebrow={`Fiscal year · ${year}`}
+        headline="Personnel · Operations · Capital, stage by stage"
+        dek="Pick a fiscal year to see how the budget's composition changes across the seven stages of the cycle."
       />
+
+      <Eyebrow>Pick a fiscal year</Eyebrow>
+      <div className="year-strip" style={{ marginTop: 8, marginBottom: 28 }}>
+        {allYears.map(y => {
+          const t = yearStage[y]?.NEP?.total;
+          const maxYear = Math.max(...allYears.map(yy => yearStage[yy]?.NEP?.total || 0));
+          const pctVal = maxYear ? ((t || 0) / maxYear) * 100 : 0;
+          return (
+            <Link key={y} to={`/year/${y}`} className={`year-cell ${year === y ? 'active' : ''}`}>
+              <div className="year-cell-num">FY {y}</div>
+              <div className="year-cell-meta">{fmt.shortPhp(t, 'B')} NEP</div>
+              <div className="year-cell-bar"><span style={{ width: pctVal + '%' }} /></div>
+            </Link>
+          );
+        })}
+      </div>
 
       <div className="card">
         <div className="card-head">
-          <h3 className="card-title">{selectedStage?.full}</h3>
+          <h3 className="card-title">FY {year} budget cycle</h3>
           <div className="stage-legend">
             <span><span className="swatch" style={{ background: "var(--stage-3)" }} />PS</span>
             <span><span className="swatch" style={{ background: "var(--stage-5)" }} />MOOE</span>
             <span><span className="swatch" style={{ background: "var(--stage-7)" }} />CO</span>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: `repeat(${allYears.length}, 1fr)`, gap: 8, alignItems: "end", height: 280, padding: "12px 0" }}>
-          {data.map(d => {
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${STAGES.length}, 1fr)`, gap: 8, alignItems: "end", height: 280, padding: "12px 0" }}>
+          {stageRows.map(d => {
             const h = (d.total / max) * 240;
             const psH = d.total ? (d.ps / d.total) * h : 0;
             const mH = d.total ? (d.mooe / d.total) * h : 0;
             const coH = d.total ? (d.co / d.total) * h : 0;
             return (
-              <div key={d.year} className="flex-col items-center gap-2">
-                <div className="mono text-xs">{fmt.shortPhp(d.total, "B")}</div>
-                <div style={{ width: "70%", height: h, display: "flex", flexDirection: "column-reverse", border: "1px solid var(--ink)" }}>
+              <div key={d.key} className="flex-col items-center gap-2">
+                <div className="mono text-xs">{d.total ? fmt.shortPhp(d.total, "B") : "—"}</div>
+                <div style={{ width: "70%", minHeight: 2, height: Math.max(h, d.total ? 2 : 0), display: "flex", flexDirection: "column-reverse", border: d.total ? "1px solid var(--ink)" : "1px solid var(--rule)" }}>
                   <div style={{ height: psH, background: "var(--stage-3)" }} title={`PS: ${fmt.shortPhp(d.ps, "B")}`} />
                   <div style={{ height: mH, background: "var(--stage-5)" }} title={`MOOE: ${fmt.shortPhp(d.mooe, "B")}`} />
                   <div style={{ height: coH, background: "var(--stage-7)" }} title={`CO: ${fmt.shortPhp(d.co, "B")}`} />
                 </div>
-                <div className="mono text-xs muted">FY {d.year}</div>
+                <div className="mono text-xs muted">{d.label}</div>
               </div>
             );
           })}
@@ -489,20 +496,20 @@ export const YearComparison = ({ STAGES, yearStage, agencyYearStage, currency, a
         {(["ps", "mooe", "co"] as const).map(k => {
           const colors: Record<string, string> = { ps: "var(--stage-3)", mooe: "var(--stage-5)", co: "var(--stage-7)" };
           const labels: Record<string, string> = { ps: "Personnel", mooe: "Operations", co: "Capital outlay" };
-          const totals = data.map(d => d[k]);
+          const totals = stageRows.map(d => d[k]);
           const maxV = Math.max(...totals, 1);
           return (
             <div key={k} className="card subtle">
               <div className="card-meta" style={{ color: colors[k] }}>{labels[k]}</div>
-              <div className="big-num">{fmt.shortPhp(totals[totals.length - 1], "B")}</div>
-              <div className="muted text-xs" style={{ marginBottom: 8 }}>FY {allYears[allYears.length - 1]}</div>
+              <div className="big-num">{fmt.shortPhp(latestComplete[k], "B")}</div>
+              <div className="muted text-xs" style={{ marginBottom: 8 }}>FY {year} {selectedYearData.GAA ? "GAA" : "NEP"}</div>
               <div style={{ display: "flex", gap: 4, alignItems: "end", height: 50 }}>
-                {data.map(d => (
-                  <div key={d.year} style={{ flex: 1, height: (d[k] / maxV) * 50, background: colors[k] }} title={`FY ${d.year}: ${fmt.shortPhp(d[k], "B")}`} />
+                {stageRows.map(d => (
+                  <div key={d.key} style={{ flex: 1, height: (d[k] / maxV) * 50, background: colors[k] }} title={`${d.label}: ${fmt.shortPhp(d[k], "B")}`} />
                 ))}
               </div>
               <div className="flex between text-xs muted mono" style={{ marginTop: 4 }}>
-                <span>{allYears[0]}</span><span>{allYears[allYears.length - 1]}</span>
+                <span>{STAGES[0]?.label}</span><span>{STAGES[STAGES.length - 1]?.label}</span>
               </div>
             </div>
           );

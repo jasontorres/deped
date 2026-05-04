@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { Stage, StageTotals, PapMeta } from '../lib/data-loader';
 import fmt from '../lib/format';
 import { SectionHead } from './Shared';
@@ -38,7 +39,7 @@ export const PapDetail = ({ STAGES, pivot, papMeta, currency, allYears, onClose 
       <div className="breadcrumb">
         <button className="crumb" onClick={onClose}>← Back</button>
         <span className="sep">/</span>
-        <span>{papMeta.agencyName}</span>
+        <Link className="crumb" to={`/agency/${encodeURIComponent(papMeta.agency)}`}>{papMeta.agencyName}</Link>
         <span className="sep">/</span>
         <span className="here">{papMeta.pap}</span>
       </div>

@@ -4,8 +4,8 @@ import '../styles/narrative.css';
 import '../styles/narrative-future.css';
 
 const BODY_HTML = `<div class="chrome">
-  <div class="chrome-mark"><b>A Budget</b> for the Future</div>
-  <a href="/">← Return to portal</a>
+  <div class="chrome-mark"><b>DepEd</b> Fiscal Review</div>
+  <a href="/overview">Browse the Transparency Portal</a>
 </div>
 
 <div class="progress"></div>
@@ -17,16 +17,20 @@ const BODY_HTML = `<div class="chrome">
     <div class="editorial-rule" data-anim="fade-up"></div>
     <div class="eyebrow" data-anim="fade-up" style="--delay:100ms;"><span class="num">01</span> Department of Education Fiscal Review</div>
 
-    <div class="year-banner" data-anim="fade-up" style="--delay:300ms;margin-top:40px;">
+    <h1 class="h-display fiscal-review-title" data-anim="fade-up" style="--delay:250ms;text-align:center;margin-top:34px;color:var(--ink);">
+      The Department of Education Six Year Fiscal Review
+    </h1>
+
+    <div class="year-banner" data-anim="fade-up" style="--delay:450ms;margin-top:34px;">
       <span class="year year-from">2021</span>
-      <span class="arrow">→</span>
+      <span class="arrow">-&gt;</span>
       <span class="year year-to">2026</span>
     </div>
-    <p class="kicker" data-anim="fade-up" style="--delay:600ms;text-align:center;">Six fiscal years of basic-education spending</p>
+    <p class="kicker" data-anim="fade-up" style="--delay:650ms;text-align:center;">Six Fiscal Years of Basic Education Spending</p>
 
-    <h1 class="giant-num" data-anim="zoom-out" style="--delay:900ms;color:var(--accent);margin-top:56px;">
+    <div class="giant-num" data-anim="zoom-out" style="--delay:900ms;color:var(--accent);margin-top:56px;">
       <span class="peso">₱</span><span class="tick" data-target="25.61" data-decimals="2" data-dur="2200">0.00</span><span class="unit" style="font-family:var(--font-display);font-style:normal;text-transform:uppercase;font-size:0.18em;letter-spacing:0.04em;">trillion</span>
-    </h1>
+    </div>
     <p class="lede" data-anim="fade-up" style="--delay:1400ms;text-align:center;margin-top:48px;max-width:60ch;">
       For 23 million children. For 900,000 teachers. For 47,000 schools.<br/>This is the story of a country choosing its future.
     </p>
@@ -509,7 +513,7 @@ const BODY_HTML = `<div class="chrome">
       And in 2026, the Filipino people made the largest one yet — to their teachers, to their schools, and to the 23 million children whose futures depend on what we choose to fund.
     </p>
     <div data-anim="fade-up" style="--delay:1000ms;margin-top:64px;display:flex;gap:18px;flex-wrap:wrap;justify-content:center;">
-      <a href="/" style="font-family:var(--font-hero);font-weight:700;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;background:var(--ink);color:var(--accent-soft);padding:18px 28px;text-decoration:none;border-radius:2px;">Explore the data →</a>
+      <a href="/overview" style="font-family:var(--font-hero);font-weight:700;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;background:var(--ink);color:var(--accent-soft);padding:18px 28px;text-decoration:none;border-radius:2px;">Explore the data →</a>
       <a href="/investigation" style="font-family:var(--font-hero);font-weight:700;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;background:transparent;color:var(--ink);padding:18px 28px;text-decoration:none;border:2px solid var(--ink);border-radius:2px;">Read the investigation →</a>
     </div>
   </div>
@@ -535,7 +539,7 @@ const BODY_HTML = `<div class="chrome">
     Source: Department of Budget and Management releases (NEP, GAA, BESF, BAR/FAR submissions) compiled into a single dataset of 4,440 program-stage observations spanning fiscal years 2021–2026. Disbursement data unavailable for 2026 as of compilation; the fiscal year is in progress. Per-learner / per-teacher / per-school figures are notional averages computed from the 2026 GAA divided by approximate sector counts (DepEd Basic Education Statistics). Stock photography: Unsplash.
   </p>
   <p class="meta">
-    A Budget for the Future · The DepEd Story · <a href="/" style="color:inherit;">Return to portal →</a>
+    The Department of Education Six Year Fiscal Review · <a href="/overview" style="color:inherit;">Browse the Transparency Portal →</a>
   </p>
 </footer>
 

@@ -103,7 +103,8 @@ button {
   border-top: 1px solid var(--rule-soft);
   padding-top: 14px;
 }
-.masthead-nav button {
+.masthead-nav button,
+.masthead-nav a {
   background: none;
   border: none;
   padding: 6px 0;
@@ -115,10 +116,13 @@ button {
   text-transform: inherit;
   border-bottom: 3px solid transparent;
   margin-bottom: -3px;
+  text-decoration: none;
   transition: color .12s;
 }
-.masthead-nav button:hover { color: var(--ink); }
-.masthead-nav button.active {
+.masthead-nav button:hover,
+.masthead-nav a:hover { color: var(--ink); }
+.masthead-nav button.active,
+.masthead-nav a.active {
   color: var(--ink);
   border-bottom-color: var(--accent);
 }
@@ -311,7 +315,9 @@ button {
   padding: 18px 16px 16px;
   border-right: 1px solid var(--rule);
   background: transparent;
+  color: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   position: relative;
   transition: background .15s;
@@ -830,12 +836,13 @@ table.editorial tr.clickable { cursor: pointer; }
     text-transform: uppercase;
     transition: color .2s ease, padding-left .2s ease;
   }
-  .mobile-nav-panel button.active {
+  .mobile-nav-panel button.active,
+  .mobile-nav-panel a.active {
     color: var(--ink);
     padding-left: 8px;
     border-left: 3px solid var(--accent);
   }
-  .mobile-nav-panel a {
+  .mobile-nav-panel a:not(.active) {
     color: var(--accent);
   }
 
