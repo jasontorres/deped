@@ -138,12 +138,6 @@ export function PortalPage() {
                 {n.label}
               </NavLink>
             ))}
-            <Link to="/" className="masthead-nav-link">
-              The Story →
-            </Link>
-            <Link to="/investigation" className="masthead-nav-link" style={{ marginLeft: 0, color: 'var(--ink-3)' }}>
-              BUDGET PREPARATION →
-            </Link>
           </nav>
           <nav id="mobile-nav" className={`mobile-nav-panel ${mobileNavOpen ? 'open' : ''}`} aria-hidden={!mobileNavOpen}>
             {navItems.map(n => (
@@ -154,12 +148,6 @@ export function PortalPage() {
                 {n.label}
               </NavLink>
             ))}
-            <Link to="/" onClick={() => setMobileNavOpen(false)}>
-              The Story →
-            </Link>
-            <Link to="/investigation" onClick={() => setMobileNavOpen(false)}>
-              BUDGET PREPARATION →
-            </Link>
           </nav>
         </div>
       </header>

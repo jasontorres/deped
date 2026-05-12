@@ -65,9 +65,9 @@ body {
 }
 .h-display { font-size: clamp(64px, 9vw, 144px) !important; }
 .fiscal-review-title {
-  font-size: clamp(44px, 6vw, 92px) !important;
-  line-height: 0.92 !important;
-  max-width: 13ch;
+  font-size: clamp(32px, 4.2vw, 64px) !important;
+  line-height: 0.95 !important;
+  max-width: 16ch;
 }
 .h-1 { font-size: clamp(48px, 6vw, 96px) !important; font-weight: 500 !important; }
 .h-2 { font-size: clamp(36px, 4.5vw, 64px) !important; font-weight: 500 !important; }
@@ -189,7 +189,7 @@ body {
 .bg-ink .eyebrow, .bg-slate .eyebrow, .bg-slate-deep .eyebrow, .bg-leaf .eyebrow, .bg-rose .eyebrow, .bg-accent .eyebrow { color: var(--accent-soft) !important; }
 .bg-ink .eyebrow .num, .bg-slate .eyebrow .num, .bg-slate-deep .eyebrow .num, .bg-leaf .eyebrow .num, .bg-rose .eyebrow .num, .bg-accent .eyebrow .num { background: rgba(255,255,255,0.18) !important; color: #fff !important; }
 
-.bg-ink .kicker, .bg-slate .kicker, .bg-slate-deep .kicker, .bg-leaf .kicker, .bg-rose .kicker, .bg-accent .kicker { color: var(--paper-warm) !important; opacity: 0.7; }
+.bg-ink .kicker, .bg-slate .kicker, .bg-slate-deep .kicker, .bg-sky .kicker, .bg-sky-deep .kicker, .bg-leaf .kicker, .bg-rose .kicker, .bg-accent .kicker { color: var(--paper-warm) !important; opacity: 0.9; }
 
 .bg-ink .stat-strip, .bg-slate .stat-strip, .bg-slate-deep .stat-strip, .bg-leaf .stat-strip, .bg-rose .stat-strip, .bg-accent .stat-strip {
   border-top-color: rgba(255,255,255,0.22);
@@ -256,7 +256,7 @@ body {
   flex-wrap: wrap;
 }
 .year-banner .year {
-  font-size: clamp(56px, 8vw, 128px);
+  font-size: clamp(36px, 5vw, 80px);
   line-height: 0.9;
   color: var(--ink);
   font-feature-settings: "tnum";
@@ -278,7 +278,7 @@ body {
 }
 .year-banner .arrow {
   font-family: var(--font-display);
-  font-size: clamp(56px, 8vw, 128px);
+  font-size: clamp(36px, 5vw, 80px);
   line-height: 0.9;
   color: var(--ink-3);
   font-weight: 300;
@@ -478,7 +478,8 @@ body {
   padding-top: 16px;
   border-top: 1px solid var(--rule-soft);
 }
-.bg-slate-deep .unlock-card .note, .bg-ink .unlock-card .note, .bg-leaf .unlock-card .note { color: var(--paper-warm); opacity: 0.6; border-top-color: rgba(255,255,255,0.18); }
+.bg-slate-deep .unlock-card .note, .bg-ink .unlock-card .note, .bg-leaf .unlock-card .note,
+.bg-sky-deep .unlock-card .note, .bg-sky .unlock-card .note, .bg-rose .unlock-card .note { color: #f1ebd9; opacity: 0.95; border-top-color: rgba(255,255,255,0.28); }
 @media (max-width: 900px) { .unlock-grid { grid-template-columns: 1fr; } }
 
 /* Forward arrow — editorial weight */

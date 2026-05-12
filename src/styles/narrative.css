@@ -219,7 +219,11 @@ img { max-width: 100%; display: block; }
   margin: 28px 0 0;
   font-style: italic;
 }
-.bg-ink .lede { color: #d8cfb6; }
+.bg-ink .lede,
+.bg-sky .lede,
+.bg-sky-deep .lede,
+.bg-leaf .lede,
+.bg-rose .lede { color: #e8dfc6; }
 .bg-accent .lede, .bg-gold .lede { color: #f3d9b6; }
 
 .body {
@@ -465,7 +469,24 @@ img { max-width: 100%; display: block; }
   letter-spacing: -0.02em;
   font-feature-settings: "tnum";
 }
-.bg-ink .stat-strip .num { color: #f1ebd9; }
+.bg-ink .stat-strip .num,
+.bg-sky .stat-strip .num,
+.bg-sky-deep .stat-strip .num,
+.bg-leaf .stat-strip .num,
+.bg-rose .stat-strip .num,
+.bg-accent .stat-strip .num { color: #f1ebd9; }
+.bg-sky .stat-strip,
+.bg-sky-deep .stat-strip,
+.bg-leaf .stat-strip,
+.bg-rose .stat-strip { border-top-color: rgba(255,255,255,0.22); border-bottom-color: rgba(255,255,255,0.22); }
+.bg-sky .stat-strip .cell,
+.bg-sky-deep .stat-strip .cell,
+.bg-leaf .stat-strip .cell,
+.bg-rose .stat-strip .cell { border-right-color: rgba(255,255,255,0.22); }
+.bg-sky .stat-strip .label,
+.bg-sky-deep .stat-strip .label,
+.bg-leaf .stat-strip .label,
+.bg-rose .stat-strip .label { color: rgba(255,248,231,0.72); }
 
 /* Stage chip */
 .stage-chip {
